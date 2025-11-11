@@ -1,0 +1,217 @@
+\\quiz.html\\
+
+<html>
+<head>
+    <title>Software Engineering Quiz</title>
+    <style>
+        body {
+            background-color: black;
+            font-family: Arial, sans-serif;
+        }
+        .app {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            margin: 100px auto 0;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .app h1 {
+            font-size: 25px;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+            padding-bottom: 30px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .quiz h2 {
+            font-size: 18px;
+            color: rgb(13, 13, 74);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: rgb(220, 219, 248);
+            font-weight: 500;
+            color: #222;
+            width: 100%;
+            border: none;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: left;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .correct {
+            background-color: rgb(91, 176, 91);
+            color: white;
+        }
+        .incorrect {
+            background-color: rgb(231, 135, 135);
+            color: white;
+        }
+        #next-btn {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 500;
+            width: 150px;
+            border: none;
+            padding: 10px;
+            margin: 20px auto 0;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s;
+        }
+        #next-btn:hover {
+            background-color: #1a252f;
+        }
+        .score-container {
+            text-align: center;
+        }
+        .score-container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>Software Engineering Quiz</h1>
+        <div class="quiz">
+            <h2 id="question">Question</h2>
+            <div id="answer-buttons"></div>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            {
+                question: "1. What is the main objective of Software Engineering?",
+                answers: [
+                    { text: "To produce software quickly without considering quality", correct: false },
+                    { text: "To develop software systematically with high quality", correct: true },
+                    { text: "To write code in multiple languages", correct: false },
+                    { text: "To focus only on testing software", correct: false }
+                ]
+            },
+            {
+                question: "2. Which model is known as the Linear Sequential Model?",
+                answers: [
+                    { text: "Spiral Model", correct: false },
+                    { text: "Prototype Model", correct: false },
+                    { text: "Waterfall Model", correct: true },
+                    { text: "Agile Model", correct: false }
+                ]
+            },
+            {
+                question: "3. What is the main purpose of Software Requirement Specification (SRS)?",
+                answers: [
+                    { text: "To define what the software should do", correct: true },
+                    { text: "To write the source code", correct: false },
+                    { text: "To test the final product", correct: false },
+                    { text: "To deploy the application", correct: false }
+                ]
+            },
+            {
+                question: "4. What does SRS stand for in Software Engineering?",
+                answers: [
+                    { text: "System Report Summary", correct: false },
+                    { text: "Software Requirement Specification", correct: true },
+                    { text: "Software Resource Setup", correct: false },
+                    { text: "System Requirement Sheet", correct: false }
+                ]
+            },
+            {
+                question: "5. Which of the following is NOT a phase in the Software Development Life Cycle (SDLC)?",
+                answers: [
+                    { text: "Requirement Analysis", correct: false },
+                    { text: "Design", correct: false },
+                    { text: "Coding", correct: false },
+                    { text: "Marketing", correct: true }
+                ]
+            }
+        ];
+
+        const questionElement = document.getElementById("question");
+        const answerButtons = document.getElementById("answer-buttons");
+        const nextButton = document.getElementById("next-btn");
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.innerHTML = "Next";
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            let currentQuestion = questions[currentQuestionIndex];
+            questionElement.innerHTML = currentQuestion.question;
+
+            currentQuestion.answers.forEach(answer => {
+                const button = document.createElement("button");
+                button.innerHTML = answer.text;
+                button.classList.add("btn");
+                answerButtons.appendChild(button);
+                if (answer.correct) button.dataset.correct = answer.correct;
+                button.addEventListener("click", selectAnswer);
+            });
+        }
+
+        function resetState() {
+            nextButton.style.display = "none";
+            while (answerButtons.firstChild) {
+                answerButtons.removeChild(answerButtons.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.target;
+            const isCorrect = selectedBtn.dataset.correct === "true";
+            if (isCorrect) {
+                selectedBtn.classList.add("correct");
+                score++;
+            } else {
+                selectedBtn.classList.add("incorrect");
+            }
+            Array.from(answerButtons.children).forEach(button => {
+                if (button.dataset.correct === "true") button.classList.add("correct");
+                button.disabled = true;
+            });
+            nextButton.style.display = "block";
+        }
+
+        function showScore() {
+            resetState();
+            questionElement.innerHTML = `🎉 You scored ${score} out of ${questions.length}!`;
+            nextButton.innerHTML = "Play Again";
+            nextButton.style.display = "block";
+        }
+
+        function handleNextButton() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showScore();
+            }
+        }
+
+        nextButton.addEventListener("click", () => {
+            if (currentQuestionIndex < questions.length) {
+                handleNextButton();
+            } else {
+                startQuiz();
+            }
+        });
+
+        startQuiz();
+    </script>
+</body>
+</html>
+
